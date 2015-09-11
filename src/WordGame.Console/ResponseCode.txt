@@ -1,0 +1,482 @@
+using System;
+
+namespace Challenge.Core
+{
+    using System.IO;
+
+    public class Disposable : IDisposable
+    {
+        protected Disposable()
+        {
+        }
+
+        ~Disposable()
+        {
+            Dispose(false);
+        }
+
+        private bool _disposed;
+
+        protected bool IsDisposed
+        {
+            get { return _disposed; }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+
+        public void Dispose()
+        {
+            if (IsDisposed) return;
+            Dispose(true);
+            _disposed = true;
+        }
+    }
+
+    public abstract class ChallengeBase : Disposable
+    {
+        private readonly TextWriter _writer;
+
+        protected ChallengeBase(TextReader reader, TextWriter writer)
+        {
+            _writer = writer;
+            Initialize(reader);
+        }
+
+        private void Initialize(TextReader reader)
+        {
+            Read(reader);
+        }
+
+        protected abstract void Read(TextReader reader);
+
+        protected virtual string[] ReadLines(TextReader reader)
+        {
+            return reader.ReadToEndAsync().Result.Replace("\r\n", "\n").Split('\n');
+        }
+
+        protected abstract void Report(TextWriter writer);
+
+        protected abstract void Run();
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!disposing || IsDisposed) return;
+
+            Run();
+
+            Report(_writer);
+
+            base.Dispose(true);
+        }
+    }
+}
+
+namespace WordGame
+{
+    using System.IO;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Challenge.Core;
+
+    public static class StringExtensions
+    {
+        public static string ReverseText(this string text)
+        {
+            var reversed = text.Aggregate(string.Empty, (g, c) => c + g);
+            return reversed;
+        }
+
+        public static string MaskText(this string text, int position, int count)
+        {
+            const char space = ' ';
+
+            var min = position;
+            var max = position + count - 1;
+
+            return text.Aggregate(string.Empty,
+                (g, c) => g + (g.Length >= min && g.Length <= max ? space : c));
+        }
+
+        public static string ReduceMask(this string text)
+        {
+            return text.Aggregate(string.Empty,
+                (g, c) => char.IsWhiteSpace(c) ? g : g + c);
+        }
+
+        private static char VerifySwapIndex(this string text, int i)
+        {
+            return text[i];
+        }
+
+        public static string SwapChars(this string text, int i, int j)
+        {
+            text.VerifySwapIndex(i);
+            text.VerifySwapIndex(j);
+
+            var chars = text.ToCharArray();
+
+            {
+                var x = chars[i];
+                chars[i] = chars[j];
+                chars[j] = x;
+            }
+
+            return chars.Aggregate(string.Empty, (g, x) => g + x);
+        }
+
+        private static char GetMaskedChar(this IEnumerable<char> chars)
+        {
+            const char space = ' ';
+            var local = chars.ToArray();
+            return local.Any(x => x == space) ? space : local.First();
+        }
+
+        /// <summary>
+        /// Returns the masked text merged keeping blanks where they occur. Otherwise,
+        /// leaves the non-blank characters untouched in the merge result.
+        /// </summary>
+        /// <param name="masked"></param>
+        /// <returns></returns>
+        public static string MergeBlankMasks(this IEnumerable<string> masked)
+        {
+            // Verifies that masked has all the same lengths.
+            // ReSharper disable PossibleMultipleEnumeration
+            var length = (from x in masked select x.Length).Distinct().Single();
+
+            var local = (from x in masked select x.ToCharArray()).ToArray();
+
+            return (from i in Enumerable.Range(0, length)
+                select local.Select(m => m[i]).GetMaskedChar())
+                .Aggregate(string.Empty, (g, c) => g + c);
+        }
+    }
+
+    /// <summary>
+    /// Represents the ability to analyze, match, and reduce any one compound
+    /// in a given string of elemental <see cref="Crystals"/>.
+    /// </summary>
+    public class ElementalCompound
+    {
+        private static readonly char[] ValidCrystals;
+
+        private static readonly int CompoundLength;
+
+        private static readonly string[] BasicCompounds = {"FIZ", "BAR", "BAZ"};
+
+        private static readonly string[] ReversedCompounds;
+
+        public static string VerifyCrystals(string crystals)
+        {
+            if (!crystals.ToCharArray().Except(ValidCrystals).Any())
+                return crystals;
+
+            var message = string.Format("Invalid crystals {{{0}}} expected to be among {{{1}}}.",
+                crystals, string.Join(", ", from x in ValidCrystals select string.Format("'{0}'", x)));
+
+            throw new ArgumentException(message, "crystals");
+        }
+
+        static ElementalCompound()
+        {
+            ValidCrystals = new[] {'F', 'I', 'Z', 'B', 'A', 'R'};
+            ReversedCompounds = (from x in BasicCompounds select x.ReverseText()).ToArray();
+            CompoundLength = (from x in BasicCompounds select x.Length).Distinct().Single();
+        }
+
+        public int Position { get; private set; }
+
+        public string Crystals { get; private set; }
+
+        private string _candidate;
+
+        public string Candidate
+        {
+            get
+            {
+                // Focus on only that text which should be considered, notwithstanding end of string.
+                return _candidate ?? (_candidate = Crystals.Substring(Position,
+                    Math.Min(CompoundLength, Crystals.Length - Position)));
+            }
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="text"/> exists in any of the <paramref name="compounds"/>.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="compounds"></param>
+        /// <returns></returns>
+        private static bool Evaluate(string text, params string[] compounds)
+        {
+            return compounds.Any(text.Equals);
+        }
+
+        private bool? _matched;
+
+        public bool IsMatch
+        {
+            get
+            {
+                /* Herein lies the crux of the matter. While "overlapping" is an interesting
+                 * observation, it is unnecessary in order to achieve the desired outcome,
+                 * indeed would only serve to needlessly complicate the matter. */
+
+                return (_matched ?? (_matched
+                    = Evaluate(Candidate, BasicCompounds)
+                      || Evaluate(Candidate, ReversedCompounds))).Value;
+            }
+        }
+
+        public string RemoveMatch()
+        {
+            var removed = !IsMatch ? Crystals : Crystals.MaskText(Position, CompoundLength);
+            return removed;
+        }
+
+        public ElementalCompound(int position, string crystals)
+        {
+            Position = position;
+            Crystals = crystals;
+        }
+    }
+
+    /// <summary>
+    /// Represents the alchemists workbench. Manages the crystals, compounds, and their interactions.
+    /// </summary>
+    public class Workbench
+    {
+        private string _crystals;
+
+        public string ElementalCrystals
+        {
+            get { return _crystals; }
+            private set { _crystals = ElementalCompound.VerifyCrystals(value); }
+        }
+
+        private static string VerifyCrystalCount(int count, string crystals)
+        {
+            // (0 < C < 100)
+            if (count < 0 || count > 99)
+            {
+                var message = string.Format("Expected between 0 and 99 crystals but was {{{0}}}.",
+                    count);
+
+                throw new ArgumentException(message, "count")
+                {
+                    Data = {{"count", count}}
+                };
+            }
+
+            if (crystals.Length == count)
+                return crystals;
+
+            {
+                var message = string.Format("Expected {{{0}}} crystals.", count);
+
+                throw new ArgumentException(message, "crystals")
+                {
+                    Data = {{"count", count}, {"crystals", crystals}}
+                };
+            }
+        }
+
+        public Workbench(int count, string elementalCrystals)
+        {
+            ElementalCrystals = VerifyCrystalCount(count, elementalCrystals);
+        }
+
+        private static bool TrySwap(string crystals, int swap, out string result)
+        {
+            // Nothing is swapped when a compound is not formed.
+            result = crystals;
+
+            var swapped = crystals.SwapChars(swap, swap + 1);
+
+            do
+            {
+                var eligible
+                    = (from i in Enumerable.Range(0, swapped.Length)
+                        select new ElementalCompound(i, swapped)).ToArray();
+
+                // Not all eligible compounds are actually compounds at all.
+                var screened
+                    = (from ec in eligible
+                        where ec.IsMatch
+                        select ec.RemoveMatch()).ToArray();
+
+                // Careful not to yield a forever loop.
+                if (!screened.Any()) break;
+
+                // Only do this when there are any screened compounds.
+                result = swapped = screened.MergeBlankMasks().ReduceMask();
+
+            } while (true);
+
+            return !result.Equals(crystals);
+        }
+
+        public void Evaluate(Swaps swaps)
+        {
+            foreach (var swap in swaps)
+            {
+                var crystals = ElementalCrystals;
+
+                if (TrySwap(crystals, swap, out crystals))
+                    ElementalCrystals = crystals;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Represents a set of verified swap requests.
+    /// </summary>
+    public class Swaps : IReadOnlyCollection<int>
+    {
+        private readonly IList<int> _swaps;
+
+        private static IEnumerable<int> VerifySwaps(int count, params int[] swaps)
+        {
+            // (0 <= S < 50)
+            if (count < 0 || count >= 50)
+            {
+                var message = string.Format("Expected between 0 and 50 swaps but was {{{0}}}.",
+                    count);
+
+                throw new ArgumentException(message, "count")
+                {
+                    Data = {{"count", count}}
+                };
+            }
+
+            if (swaps.Length == count)
+                return swaps;
+
+            {
+                var message = string.Format("Incorrect number of swaps expected {{{0}}} but was {{{1}}}.",
+                    count, swaps.Length);
+
+                throw new ArgumentException(message, "count");
+            }
+        }
+
+        public Swaps(int count, params int[] swaps)
+        {
+            _swaps = VerifySwaps(count, swaps).ToList();
+        }
+
+        public int Count
+        {
+            get { return _swaps.Count; }
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            return _swaps.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    /// <summary>
+    /// Represents the Game, knows how to read its input and report its output. Coordinates
+    /// the top level <see cref="Workbench"/> and <see cref="Swaps"/> interactions.
+    /// </summary>
+    public class Game : ChallengeBase
+    {
+        private Workbench _workbench;
+
+        private Swaps _swaps;
+
+        public Game(TextReader reader, TextWriter writer)
+            : base(reader, writer)
+        {
+        }
+
+        protected override string[] ReadLines(TextReader reader)
+        {
+            var lines = base.ReadLines(reader);
+
+            if (lines.Length != 4)
+                throw new ArgumentException("Expected 4 lines of input.", "reader");
+
+            return lines;
+        }
+
+        protected override void Read(TextReader reader)
+        {
+            var lines = ReadLines(reader);
+
+            // TODO: could trim the string, should also check for caps, and/or just ToUpper
+            _workbench = new Workbench(int.Parse(lines[0]), lines[1]);
+
+            _swaps = new Swaps(int.Parse(lines[2]),
+                (from x in lines[3].Split(' ') select int.Parse(x)).ToArray());
+        }
+
+        protected override void Run()
+        {
+            _workbench.Evaluate(_swaps);
+        }
+
+        protected override void Report(TextWriter writer)
+        {
+            writer.WriteLine(_workbench.ElementalCrystals);
+        }
+    }
+
+    class Program
+    {
+
+#if DEVELOP
+
+        private static IEnumerable<string> TestCases
+        {
+            get
+            {
+                yield return @"10
+BFIBZRAFBF
+2
+3 4";
+                // Third request should swap BBFF -> BFBF which should be yield BBFF after being rejected.
+                yield return @"10
+BFIBZRAFBF
+3
+3 4 2";
+            }
+        }
+
+#endif
+
+        static void Main(string[] args)
+        {
+
+#if DEVELOP
+
+            foreach (var testCase in TestCases)
+            {
+                using (var reader = new StringReader(testCase))
+                {
+                    using (var game = new Game(reader, Console.Out))
+                    {
+                        // Everything is handled internal to the game.
+                    }
+                }
+            }
+
+#else
+
+            using (var game = new Game(Console.In, Console.Out))
+            {
+                // Everything is handled internal to the game.
+            }
+
+#endif
+
+        }
+    }
+}

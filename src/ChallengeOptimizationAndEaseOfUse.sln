@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EaseOfUse.Console", "EaseOf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScalabilityAndDesign.Console", "ScalabilityAndDesign.Console\ScalabilityAndDesign.Console.csproj", "{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Challenge.Core", "Challenge.Core\Challenge.Core.csproj", "{146CD4DA-6086-4264-BAD1-B3EA2E980176}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{146CD4DA-6086-4264-BAD1-B3EA2E980176}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{146CD4DA-6086-4264-BAD1-B3EA2E980176}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{146CD4DA-6086-4264-BAD1-B3EA2E980176}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{146CD4DA-6086-4264-BAD1-B3EA2E980176}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

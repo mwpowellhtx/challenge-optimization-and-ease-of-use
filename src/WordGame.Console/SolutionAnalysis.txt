@@ -1,0 +1,60 @@
+
+Solution Analysis
+
+You solved the challenge. Now imagine that you need to present your solution to your development team. How would you describe your approach?
+
+
+
+The object discovery process was layered and algorithmic in its nature. What do I mean by that? I followed the algorithm as it was described, and performed mental logical reductions where possible. For instance, "overlapping compounds", while interesting, is unnecessary in the final analysis.
+
+At a high level, there are several key players in the domain: Workbench, Swaps, ExternalCompound, and, of course, Game.
+
+Inputs or changes in state are passed through verification methods.
+
+* Game
+
+For increased testability, Game extends ChallengeBase, which accepts a TextReader and TextWriter. This allows for easy integration of Console.In, Console.Out, or test cases and/or report streams.
+
+Game reads the Workbench and Swaps inputs, runs the swaps evaluations, and reports the remaining ElementalCrystals.
+
+* Swaps
+
+Swaps is a straightforward read-only collection. It is simple a verified collection of swap requests. Verified in the sense that the count and swaps themselves are all verified prior to running.
+
+* Workbench
+
+The purpose of Workbench is to manage ElementalCrystals between swap requests.
+
+Masked compounds are "merged", that is we yield a space (blank) when at least one is present, or the crystal character itself when no spaces are present, and reduced, that is we remove the space characters. See ExternalCompound.
+
+The crystals are only changed when there is something to change.
+
+If there were no changes to the crystals after trying to swap the crystals in the next request then nothing is changed.
+
+* ExternalCompound
+
+This is the heavy lifter of the domain. Several things are going on here.
+
+Compound organizes a the strategic static concerns of verifying the crystals themselves, keeping track of basic and reversed compounds that are used throughout the program.
+
+Compound works from the current Crystals and a Position into the string. Candidate substring is extracted given position and at most three (3) characters, depending on the position and length of the crystal string.
+
+Whether there is a match is evaluated based on Candidate and the BasicCompound and ReversedCompounds. Finally, the Crystals are masked depending whether a match was discovered.
+
+
+
+What is the time complexity of your solution?
+
+Basically O(n), where n = the number of requested Swaps.
+
+
+
+What is the space complexity of your solution?
+
+Basically O(1), there is only ever one workbench and one string of crystals. One might potentially consider the Swaps as being O(n).
+
+
+
+Answer Submitted
+
+Your answer has been successfully submitted on Fri Sep 11 2015 12:38:30 GMT-0400 (Eastern Standard Time). Please make sure to submit answers to all parts of the challenge that you complete in order to receive full scorecard.
