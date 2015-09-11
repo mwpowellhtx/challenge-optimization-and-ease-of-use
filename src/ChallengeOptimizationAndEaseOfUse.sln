@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordGame.Console", "WordGame.Console\WordGame.Console.csproj", "{DE3D69A3-AD27-463C-9D46-85AE525B35C4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parade.Console", "Parade.Console\Parade.Console.csproj", "{42BA95D2-C994-4623-B8D6-9A48CABABF6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EaseOfUse.Console", "EaseOfUse.Console\EaseOfUse.Console.csproj", "{6BB8DA1C-C80E-4603-BA93-D8DEC7CD3F93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScalabilityAndDesign.Console", "ScalabilityAndDesign.Console\ScalabilityAndDesign.Console.csproj", "{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE3D69A3-AD27-463C-9D46-85AE525B35C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE3D69A3-AD27-463C-9D46-85AE525B35C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE3D69A3-AD27-463C-9D46-85AE525B35C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE3D69A3-AD27-463C-9D46-85AE525B35C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42BA95D2-C994-4623-B8D6-9A48CABABF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42BA95D2-C994-4623-B8D6-9A48CABABF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42BA95D2-C994-4623-B8D6-9A48CABABF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42BA95D2-C994-4623-B8D6-9A48CABABF6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BB8DA1C-C80E-4603-BA93-D8DEC7CD3F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BB8DA1C-C80E-4603-BA93-D8DEC7CD3F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BB8DA1C-C80E-4603-BA93-D8DEC7CD3F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BB8DA1C-C80E-4603-BA93-D8DEC7CD3F93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB92180A-9AFB-426D-8095-8AEA6A5E2A96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

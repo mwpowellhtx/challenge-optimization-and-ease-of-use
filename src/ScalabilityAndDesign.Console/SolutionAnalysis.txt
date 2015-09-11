@@ -1,0 +1,28 @@
+
+https://app.devdraft.com/#!/workspace/72e6d226-daa5-4333-8473-850853d62aa9
+
+Scalability and Design
+
+Why am I being asked these questions?
+
+These questions don't correspond to any metrics, but your answers to them will be presented to companies directly for their review.
+
+If you complete them, these questions help us show a more complete picture of your skillset, demonstrating to companies that you can design and scale systems in addition to possessing the coding competencies you've demonstrated through other sections.
+
+System Design
+
+The personal organizer app in part 2 allows users to tag their notes to make searching easier. Imagine a site that, instead of storing personal notes, hosts public articles. Users are able to submit their own tags to the articles they read and search for articles tagged by other users. The vast majority of users perceive no limit to how many articles they can publish and how many tags they can submit.
+
+At a high level, describe how you would build such a search system. Reflect on how you would build and scale the user interface, how you would build a scalable backend and where you would store the data. Feel free to make reasonable assumptions; the details are deliberately underspecified. You can focus your discussion on the parts that you think are the most interesting.
+
+Please note that the sole purpose of this information is to showcase your skills to prospective employers. DevDraft will not use this information to build an actual product.
+
+Parallel Solution
+
+For the Parade problem in Part 1, how would you take advantage of multiple machines to solve it more efficiently? Suppose that you have a cluster of machines and the list of threats per block can fit in the memory of a single machine, but there are a lot of forces of different patrol lengths to deploy.  You may distribute the input across the machines in whatever manner you prefer. You can use your choice of technologies. At a high level, give a short explanation of how you would parallelize the task. Feel free to make appropriate assumptions.
+
+Feedback
+
+We strive to make taking these challenges as enjoyable as possible for developers.  Please let us know how you enjoyed your DevDraft challenge experience, what you liked, and anything you would like to see improved.  Thank you for participating.
+
+https://app.devdraft.com/#!/workspace/72e6d226-daa5-4333-8473-850853d62aa9
