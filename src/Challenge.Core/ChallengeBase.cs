@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace Challenge.Core
+﻿namespace Challenge.Core
 {
+    using System;
     using System.IO;
 
     public class Disposable : IDisposable

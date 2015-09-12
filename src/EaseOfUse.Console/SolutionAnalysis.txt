@@ -1,6 +1,29 @@
 
 Solution Analysis
 
+
+
 What did you change to fix the code?
 
+
+
+The root cause of the issue turned out to be how the query prefixes were not being handled as per the specification while looking up suggestions.
+
+While I was there, I decoupled the console from the reading, running and reporting aspects of the challenge implementation. This helps test under unit test conditions as well as within scope of the test harness.
+
+We must also revise the requirement ahead of the code itself: "Finally there are S searches, one per line, that represent the characters the user types as the user tries to type a tag."
+
+This should also take into account the format of those searches. For purposes of this exercise, I will consider space separated words as being separate tag keyword searches. Although the verbiage is there if you dig deep enough, it should be plainly stated for all stakeholders and contributors alike to see at all levels of traceability.
+
+
+
 Did you see any bad coding practices in the original code?
+
+
+
+If, in fact, the tags are intended to reference potentially more than one note, then I'm not sure the best of data structures if being used to capture that concern. Instead of a dictionary, I might consider something beefier, like a graph, or even goins as far as to formalize "tag" into a first-class entity.
+
+Also, best practice suggests you test all of the test cases, not just a handful of known-good use cases. In this case, that includes edge cases including, but not limited to, things like empty input queries, and multiple input queries.
+
+Just besides that, especially in a .NET / C# environment, make better use of LINQ features. They are there to help "visualize", so to speak, the questions being asked. Better answers are therefore obtained when this is performed.
+
