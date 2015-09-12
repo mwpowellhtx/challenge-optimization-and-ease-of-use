@@ -1,0 +1,508 @@
+#include <algorithm>
+#include <exception>
+#include <climits>
+#include <cstdlib>
+#include <iostream>
+#include <numeric>
+#include <sstream>
+#include <string>
+#include <vector>
+
+namespace challenges {
+
+    class challenge_base {
+
+        std::ostream * _pos;
+
+    protected:
+
+        virtual std::vector<std::string> read_lines(std::istream & is) {
+            std::vector<std::string> lines;
+            while (!is.eof()) {
+                std::string line;
+                std::getline(is, line);
+                lines.push_back(line);
+            }
+            return lines;
+        }
+
+        void init(std::istream & is) {
+            read_lines(is);
+        }
+
+    protected:
+
+        challenge_base(std::ostream * pos)
+            : _pos(pos) {
+        }
+
+    protected:
+
+        virtual void run() = 0;
+
+        virtual void report(std::ostream & os) = 0;
+
+        void finish() {
+            run();
+            report(*_pos);
+        }
+
+    public:
+
+        virtual ~challenge_base() {
+        }
+    };
+}
+
+namespace challenges {
+
+    int to_int(std::string const & s) {
+        //there are better ways to parse but this will do the trick for example purposes
+        return atoi(s.c_str());
+    }
+}
+
+namespace challenges {
+
+    struct split {
+
+        enum split_option {
+            none,
+            remove_empty_entries,
+        };
+
+    private:
+
+        split_option _option;
+
+        void push_back(std::vector<std::string> & result, std::string const & s) {
+            if (_option == remove_empty_entries && s.empty()) return;
+            result.push_back(s);
+        }
+
+    public:
+
+        split(split_option option = none)
+            : _option(option) {
+        }
+
+        std::vector<std::string> operator()(std::string const & s, std::string const & d = " ") {
+            std::vector<std::string> result;
+            std::string::size_type current = 0, found;
+            while ((found = s.find_first_of(d, current)) != std::string::npos) {
+                push_back(result, std::string(s, current, found - current));
+                current = found + 1;
+            }
+            push_back(result, std::string(s, current, s.size() - current));
+            return result;
+        }
+    };
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        class force {
+
+            static int _count;
+
+            int _id;
+
+            int _range;
+
+        public:
+
+            force(int range = -1);
+
+            force(force const & other);
+
+            virtual ~force();
+
+            int id() const;
+
+            int range() const;
+
+            bool has_range() const;
+        };
+    }
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        int force::_count = 0;
+
+        force::force(int range)
+            : _id(_count++),
+            _range(range) {
+        }
+
+        force::force(force const & other)
+            : _id(other._id),
+            _range(other._range) {
+        }
+
+        force::~force() {
+        }
+
+        int force::id() const {
+            return _id;
+        }
+
+        int force::range() const {
+            return std::abs(_range);
+        }
+
+        bool force::has_range() const {
+            return _range >= 0;
+        }
+    }
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        class block {
+
+            static int _count;
+
+            int _number;
+
+            int _level;
+
+            force * _pforce;
+
+        public:
+
+            block(int level);
+
+            block(block const & other);
+
+            virtual ~block();
+
+            int level() const;
+
+            int number() const;
+
+            bool is_patrolled() const;
+
+            int patrolled_level() const;
+
+            void patrol(force * pforce);
+       };
+    }
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        int block::_count = 0;
+
+        block::block(int level)
+            : _number(_count++),
+            _level(level),
+            _pforce(nullptr) {
+        }
+
+        block::block(block const & other)
+            : _number(other._number),
+            _level(other._level),
+            _pforce(nullptr) {
+        }
+
+        block::~block() {
+            _pforce = nullptr;
+        }
+
+        int block::level() const {
+            return _level;
+        }
+
+        int block::patrolled_level() const {
+            return is_patrolled() && _pforce->has_range() ? 0 : _level;
+        }
+
+        int block::number() const {
+            return _number;
+         }
+ 
+        bool block::is_patrolled() const {
+            return _pforce != nullptr;
+        }
+ 
+        void block::patrol(force * pforce) {
+            _pforce = pforce;
+        }
+    }
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        template<typename T = int>
+        T factorial(T x) {
+            static const T one = static_cast<T>(1);
+            auto result = one;
+            if (x < 0) throw std::exception();
+            while (x) result *= std::max(x--, one);
+            return result;
+        }
+
+        template<typename T = int>
+        T calculate_permutation_count(T n, T r) {
+            const T result = factorial<T>(n) / factorial<T>(static_cast<T>(n - r));
+            return result;
+        }
+    }
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        class challenge : public challenge_base {
+
+            std::vector<block> _blocks;
+
+            std::vector<force> _forces;
+
+            int _min_level;
+
+            std::vector<std::string> splitstr(std::string const & s);
+
+        public:
+
+            challenge(std::istream * pis, std::ostream * pos);
+
+            virtual ~challenge();
+
+        protected:
+
+            virtual std::vector<std::string> read_lines(std::istream & is);
+
+            virtual void run();
+
+            virtual void report(std::ostream & os);
+
+        private:
+
+            int calculate_level();
+
+            std::vector<block> read_blocks(int count, std::vector<int> const & levels);
+
+            std::vector<force> read_forces(int count, std::vector<int> const & values);
+        };
+    }
+}
+
+namespace challenges {
+
+    namespace parade {
+
+        challenge::challenge(std::istream * pis, std::ostream * pos)
+            : challenge_base(pos),
+            _blocks(),
+            _forces(),
+            _min_level(INT_MAX) {
+
+            init(*pis);
+        }
+
+        challenge::~challenge() {
+            finish();
+        }
+
+        std::vector<std::string> challenge::splitstr(std::string const & s) {
+            static split splitter(split::remove_empty_entries);
+            return splitter(s, " ");
+        }
+
+        std::vector<block> challenge::read_blocks(int count, std::vector<int> const & levels) {
+            std::vector<block> result;
+            for (auto const & level : levels) {
+                result.push_back(block(level));
+            }
+            return result;
+        }
+
+        std::vector<force> challenge::read_forces(int count, std::vector<int> const & values) {
+            std::vector<force> result;
+            for (std::vector<int>::size_type i = 0; i < values.size(); i += 2) {
+                auto range = values.at(i);
+                auto force_count = values.at(i + 1);
+                while (force_count--) {
+                    result.push_back(force(range));
+                }
+            }
+            return result;
+        }
+
+        std::vector<std::string> challenge::read_lines(std::istream & is) {
+            auto lines = challenge_base::read_lines(is);
+
+            std::vector<int> counts;
+
+            for (auto const & c : splitstr(lines[0]))
+                counts.push_back(to_int(c));
+
+            std::vector<int> levels;
+
+            for (auto const & c : splitstr(lines[1]))
+                levels.push_back(to_int(c));
+
+            _blocks = read_blocks(counts.at(0), levels);
+
+            std::vector<int> values;
+
+            for (auto const & c : splitstr(lines[2]))
+                values.push_back(to_int(c));
+
+            _forces = read_forces(counts.at(1), values);
+
+            /* This bit is key: fill in the gaps with "dummy" forces that allow the different
+            permutations to take hold across the range of potential coverages. */
+
+            auto total_range = std::accumulate(_forces.begin(), _forces.end(),
+                static_cast<int>(0),
+                [](int const & g, force const & x) { return g + x.range(); });
+
+            if (total_range < static_cast<int>(_blocks.size())) {
+
+                auto max_range = _blocks.size() - total_range;
+
+                static const int two = 2;
+                static const int one = 1;
+
+                while (max_range > one) {
+                    _forces.push_back(force(-two));
+                    max_range -= two;
+                }
+
+                if (max_range == one)
+                    _forces.push_back(force());
+            }
+
+            return lines;
+        }
+
+        int sum_block_patrolled_levels(std::vector<block> const & blocks) {
+            auto result = std::accumulate(begin(blocks), end(blocks), static_cast<int>(0),
+                [](int const & g, block const & x) { return g + x.patrolled_level(); });
+            return result;
+        }
+
+        bool try_patrol(force & force, std::vector<block> & blocks) {
+
+            auto end = blocks.end();
+
+            const auto is_patrolled = [](block const & x) { return !x.is_patrolled(); };
+
+            auto it = std::find_if(blocks.begin(), end, is_patrolled);
+
+            auto range = force.range();
+
+            if (it == end || end - it < range) return false;
+
+            const auto set_patrol = [&force](block & x) { x.patrol(&force); };
+
+            std::for_each(it, it + range, set_patrol);
+
+            return true;
+        }
+
+        int challenge::calculate_level() {
+
+            auto current_level = sum_block_patrolled_levels(_blocks);
+
+            auto begin = _forces.begin();
+            auto end = _forces.end();
+
+            const long forces_count = static_cast<long>(_forces.size());
+
+            const int permutation_count = calculate_permutation_count(forces_count, forces_count);
+
+            auto count = static_cast<int>(0);
+            auto power = 0;
+            while (std::pow(10, ++power) < permutation_count) {}
+            const auto min_count = std::pow(10, std::max(3, power - 1)) / 2;
+
+            const auto clear_patrol = [](block & x) { x.patrol(nullptr); };
+            const auto permutation_pred = [](force const & a, force const & b) { return a.id() < b.id(); };
+
+            do {
+
+                std::for_each(_blocks.begin(), _blocks.end(), clear_patrol);
+
+                for (auto it = begin; it != end; it++)
+                    if (!try_patrol(*it, _blocks)) break;
+
+                auto next_level = sum_block_patrolled_levels(_blocks);
+
+                current_level = std::min(current_level, next_level);
+
+                // Anticipate long running permutations.
+                if (++count > min_count) break;
+
+            } while (current_level && std::next_permutation(begin, end, permutation_pred));
+
+            return current_level;
+        }
+
+        void challenge::run() {
+            _min_level = calculate_level();
+        }
+
+        void challenge::report(std::ostream & os) {
+            os << _min_level << std::endl;
+        }
+    }
+}
+
+#ifdef _DEVELOP
+
+#define CRLF "\r\n"
+
+std::vector<std::string> get_test_cases() {
+    std::vector<std::string> result;
+
+    // yields: 8
+    result.push_back("7 1" CRLF "0 2 5 5 4 0 6" CRLF "3 1");
+
+    // yields: 0
+    result.push_back("7 1" CRLF "0 3 5 5 5 1 0" CRLF "3 2");
+
+    // yields: 2
+    result.push_back("10 2" CRLF "4 5 0 2 5 6 4 0 3 5" CRLF "3 1 2 2");
+
+    // yields: 18 however the permutations are vast
+    result.push_back("15 1" CRLF "1 2 4 3 8 0 0 1 2 4 6 5 4 0 0" CRLF "6 1");
+
+    return result;
+}
+
+#endif
+
+int main() {
+
+    using challenges::parade::challenge;
+
+#ifdef _DEVELOP
+
+    for (auto const & tc : get_test_cases()) {
+        std::stringstream iss(tc);
+        challenge c(&iss, &std::cout);
+    }
+
+#else
+
+    challenge c(&std::cin, &std::cout);
+
+#endif
+
+    return 0;
+}

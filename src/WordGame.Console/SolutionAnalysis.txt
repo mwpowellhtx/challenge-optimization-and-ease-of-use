@@ -58,3 +58,9 @@ Basically O(1), there is only ever one workbench and one string of crystals. One
 Answer Submitted
 
 Your answer has been successfully submitted on Fri Sep 11 2015 12:38:30 GMT-0400 (Eastern Standard Time). Please make sure to submit answers to all parts of the challenge that you complete in order to receive full scorecard.
+
+Your answer has been successfully submitted!
+Challenge: https://app.devdraft.com/workspace/72e6d226-daa5-4333-8473-850853d62aa9
+Part: 0
+Confirmation number: 661a2c4a-27b4-40c1-bdc6-234b65931823
+Please make sure to submit answers to all parts of the challenge in order to get full scorecard.
