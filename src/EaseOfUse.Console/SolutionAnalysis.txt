@@ -27,3 +27,10 @@ Also, best practice suggests you test all of the test cases, not just a handful 
 
 Just besides that, especially in a .NET / C# environment, make better use of LINQ features. They are there to help "visualize", so to speak, the questions being asked. Better answers are therefore obtained when this is performed.
 
+
+
+
+Your answer has been successfully submitted!
+Challenge: https://app.devdraft.com/workspace/72e6d226-daa5-4333-8473-850853d62aa9
+Part: 1
+Confirmation number: 88114ce1-e192-4e68-873c-b70fc5b3f71f

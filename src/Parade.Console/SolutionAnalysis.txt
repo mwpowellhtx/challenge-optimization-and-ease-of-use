@@ -42,3 +42,11 @@ Permutations are always expensive to measure: O((n + 1)! / (n - k)!). Great leng
 What is the space complexity of your solution?
 
 O(n) where n = f forces + b blocks. All permutations are done in place using the iterators themselves. This is one area where C++ gets it beautifully right! :-)
+
+
+
+
+Your answer has been successfully submitted!
+Challenge: https://app.devdraft.com/workspace/72e6d226-daa5-4333-8473-850853d62aa9
+Part: 2
+Confirmation number: 39049a28-f13d-4b29-bbfa-3bc723b5f325
