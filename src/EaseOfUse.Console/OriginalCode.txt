@@ -1,0 +1,187 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+public class TagSuggester
+{
+    private Dictionary<string, List<Note>> _items;
+    
+    public static void Main()
+    {
+        TagSuggester suggester = new TagSuggester();
+        int noteCount = int.Parse(Console.ReadLine());
+        for (int i = 0; i < noteCount; i++)
+        {
+            suggester.AddNote(new Note("", Console.ReadLine()));
+        }
+        int queryCount = int.Parse(Console.ReadLine());
+        for (int q = 0; q < queryCount; q++)
+        {
+            List<string> suggestions = suggester.GetSuggestions(Console.ReadLine());
+            string output = suggestions.Count == 0 ? "" : suggestions[0];
+            for (int i = 1; i < suggestions.Count; i++)
+            {
+                output += "," + suggestions[i];
+            }
+            Console.WriteLine(output);
+        }
+    }
+    
+    public TagSuggester()
+    {
+        _items = new Dictionary<string, List<Note>>();
+    }
+    public void AddNote(Note note)
+    {
+        foreach (string t in note.GetTags())
+        {
+            string tag = t.ToLower();
+            List<Note> list;
+            if (_items.ContainsKey(tag))
+            {
+                list = _items[tag];
+            }
+            else
+            {
+                list = new List<Note>();
+                _items.Add(tag, list);
+            }
+            list.Add(note);
+        }
+    }
+    
+    public List<string> GetSuggestions(string prefix)
+    {
+        prefix = prefix.ToLower();
+        List<Suggestion> suggestions = new List<Suggestion>();
+        foreach (string tag in _items.Keys)
+        {
+            int edits;
+            if (tag.StartsWith(prefix))
+            {
+                edits = 0;
+            }
+            else if (EqualsIgnoreTypo(prefix, tag.Substring(0, Math.Min(tag.Length, prefix.Length))))
+            {
+                edits = 1;
+            }
+            else
+            {
+                edits = 2;
+            }
+            if (edits < 2)
+            {
+                suggestions.Add(new Suggestion(tag, edits, _items[tag].Count));
+            }
+        }
+        suggestions.Sort();
+        List<string> tags = new List<string>(suggestions.Count);
+        foreach (Suggestion s in suggestions)
+        {
+            tags.Add(s.Tag);
+        }
+        return tags;
+    }
+    
+    public static bool EqualsIgnoreTypo(string suspect, string word)
+    {
+        bool typo = suspect.Equals(word);
+        
+        // letter deletion
+        // try deleting letter from suspect to see if it equals word
+        typo = typo || EqualIfDeleteLetter(suspect, word);
+
+        // letter addition
+        // adding to suspect is the same as deleting from word
+        typo = typo || EqualIfDeleteLetter(word, suspect);
+
+        // letter substitution
+        // count how many letters are different between the two words.
+        if (!typo && suspect.Length == word.Length)
+        {
+            int diff = 0;
+            for (int i = 0; i < suspect.Length && diff < 2; i++)
+            {
+                if (suspect[i] != word[i])
+                {
+                    diff++;
+                }
+            }
+            typo = diff == 1;
+        }
+        return typo;
+    }
+    
+    private static bool EqualIfDeleteLetter(string deletable, string word)
+    {
+        if (deletable.Length - word.Length != 1)
+        {
+            return false;
+        }
+        int i = 0;
+        while (i < word.Length && deletable[i] == word[i])
+        {
+            i++;
+        }
+        while (i + 1 < deletable.Length && i < word.Length && deletable[i + 1] == word[i])
+        {
+            i++;
+        }
+        return i == word.Length;
+    }
+}
+
+public class Note
+{
+    private List<string> _tags;
+    private string _content;
+
+    public Note(string content, string tags)
+    {
+        List<string> list = new List<string>();
+        foreach (string s in tags.Split(new char[] { ',' }))
+        {
+            list.Add(s);
+        }
+        _content = content;
+        _tags = list;
+    }
+
+    public string getContent()
+    {
+        return _content;
+    }
+
+    public ICollection<string> GetTags()
+    {
+        return new ReadOnlyCollection<string>(_tags);
+    }
+}
+
+class Suggestion: IComparable<Suggestion>
+{
+    public readonly int Edits;
+    public readonly int Count;
+    public readonly string Tag;
+
+    public Suggestion(string tag, int edits, int count)
+    {
+        Tag = tag;
+        Edits = edits;
+        Count = count;
+    }
+
+    public int CompareTo(Suggestion o)
+    {
+        int compare = Edits - o.Edits;
+        if (compare == 0)
+        {
+            compare = o.Count - Count;
+        }
+        if (compare == 0)
+        {
+            compare = o.Tag.CompareTo(Tag);
+        }
+        return compare;
+    }
+}

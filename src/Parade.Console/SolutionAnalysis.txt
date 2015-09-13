@@ -1,0 +1,52 @@
+
+Solution Analysis
+
+
+
+You solved the challenge. Now imagine that you need to present your solution to your development team. How would you describe your approach?
+
+Firstly, I started off on this one with the intention of building in C#, which, while I know C# and .NET pretty well, I know also know C++, which happens to have ready-made algorithms that are better suited for just this sort of problem domain.
+
+The problem domain consists of several key points.
+
+* There is a challenge class that extends from challenge_base. Par for the course, these accept an std::istream and an std::ostream. For test purposes this is a std::stringstream, whereas for production it accepts std::cin.
+
+* Block represents the city blocks, a level, and an allocated force to the block. There are several queries on block that subsequently return values based on level and force.
+
+Block patrols are set and cleared throughout the algorithm.
+
+* Force represents a unit with a range, how many blocks it can cover.
+
+In order to help optimize the permutations cycle, I chose to inject "dummy" forces. These are intended to cover any gaps that the real forces cannot cover. This also has the happy side effect of helping the permutations more optimally solve the problem domain.
+
+We use vectors, algorithms, and permutations heavily throughout the code. Initially I thought perhaps cloneable was also necessary, but I backed off of this notion in favor of a simple "clear" operation.
+
+The algorithm is simply this:
+
+- evaluate the patrol coverage for the current forces permutation
+- keep track of the minimum current level
+- permute the vector of forces
+- also short circuit the permutations if an excessive number of them have happened;
+- the thought being that by that point, some permutation will have satisfied the best-possible-fit expectation
+
+Future versions could involve a more in depth analysis of the numbers, keeping a rolling set of levels, measuring various statistics, measuring for best, historical stability, etc.
+
+
+
+What is the time complexity of your solution?
+
+Permutations are always expensive to measure: O((n + 1)! / (n - k)!). Great lengths have been taken in some source stacks to serialize state, in order to not have to reiterate prior visited permutations.
+
+
+
+What is the space complexity of your solution?
+
+O(n) where n = f forces + b blocks. All permutations are done in place using the iterators themselves. This is one area where C++ gets it beautifully right! :-)
+
+
+
+
+Your answer has been successfully submitted!
+Challenge: https://app.devdraft.com/workspace/72e6d226-daa5-4333-8473-850853d62aa9
+Part: 2
+Confirmation number: 39049a28-f13d-4b29-bbfa-3bc723b5f325

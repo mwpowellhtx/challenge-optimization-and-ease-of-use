@@ -1,0 +1,8 @@
+_ReSharper.Caches/
+bin/
+obj/
+Debug/
+Release/
+*.suo
+*.user
+*.*sdf
