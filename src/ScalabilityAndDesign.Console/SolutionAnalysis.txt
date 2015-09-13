@@ -1,28 +1,84 @@
 
 https://app.devdraft.com/#!/workspace/72e6d226-daa5-4333-8473-850853d62aa9
 
+
+
 Scalability and Design
+
+
 
 Why am I being asked these questions?
 
-These questions don't correspond to any metrics, but your answers to them will be presented to companies directly for their review.
+These questions don't correspond to any metrics, but your answers to them will be presented to
+companies directly for their review.
 
-If you complete them, these questions help us show a more complete picture of your skillset, demonstrating to companies that you can design and scale systems in addition to possessing the coding competencies you've demonstrated through other sections.
+If you complete them, these questions help us show a more complete picture of your skillset,
+demonstrating to companies that you can design and scale systems in addition to possessing the
+coding competencies you've demonstrated through other sections.
+
+
 
 System Design
 
-The personal organizer app in part 2 allows users to tag their notes to make searching easier. Imagine a site that, instead of storing personal notes, hosts public articles. Users are able to submit their own tags to the articles they read and search for articles tagged by other users. The vast majority of users perceive no limit to how many articles they can publish and how many tags they can submit.
+The personal organizer app in part 2 allows users to tag their notes to make searching easier.
+Imagine a site that, instead of storing personal notes, hosts public articles. Users are able to
+submit their own tags to the articles they read and search for articles tagged by other users. The
+vast majority of users perceive no limit to how many articles they can publish and how many tags
+they can submit.
 
-At a high level, describe how you would build such a search system. Reflect on how you would build and scale the user interface, how you would build a scalable backend and where you would store the data. Feel free to make reasonable assumptions; the details are deliberately underspecified. You can focus your discussion on the parts that you think are the most interesting.
+At a high level, describe how you would build such a search system. Reflect on how you would build
+and scale the user interface, how you would build a scalable backend and where you would store the
+data. Feel free to make reasonable assumptions; the details are deliberately underspecified. You
+can focus your discussion on the parts that you think are the most interesting.
 
-Please note that the sole purpose of this information is to showcase your skills to prospective employers. DevDraft will not use this information to build an actual product.
+Please note that the sole purpose of this information is to showcase your skills to prospective
+employers. DevDraft will not use this information to build an actual product.
+
+
+
+Presumably, would want to host a backend service of some kind. Web API has caught on these days, so that might be a good fit for the backend service.
+
+The backend should employ the CQRS pattern: that is, Command Query Responsibility Separation. This is borne out of the principle of Eventual Consistency, which itself has its origins in the CAP theorem, which simply states that, of the three, one can enjoy only two: Consistency, Availability, Partition Tolerance (i.e. high level of operational up-time, in spite of network outages). High availability is always desired. Partition tolerance is also strongly desired. This leaves consistency being left to catch up as when it can.
+
+What does this mean in practical terms? Services that create or update the articles, tags, etc, are to be partitioned into at least one, probably several, services. Similarly, services that query, i.e. for suggestions based on the end-users' queries, are to be aligned in one or more separate services.
+
+From the UI/UX, we want the user interface to remain responsive while the user is engaged. We also do not want the experience to be over-zealous and constantly updating with every keystroke. So therefore we should design the service invocations in a task oriented manner (i.e. Task Parallel Library). We should delay invocation for some nominal period of time. Probably no more than 1 second, could be tuneable, somewhere in the range of 250-750 milliseconds. We should also allow the task to be canceled, if the end-user should cancel, or continues typing, thus potentially overriding the previous request.
+
+
+
 
 Parallel Solution
 
-For the Parade problem in Part 1, how would you take advantage of multiple machines to solve it more efficiently? Suppose that you have a cluster of machines and the list of threats per block can fit in the memory of a single machine, but there are a lot of forces of different patrol lengths to deploy.  You may distribute the input across the machines in whatever manner you prefer. You can use your choice of technologies. At a high level, give a short explanation of how you would parallelize the task. Feel free to make appropriate assumptions.
+For the Parade problem in Part 1, how would you take advantage of multiple machines to solve it
+more efficiently? Suppose that you have a cluster of machines and the list of threats per block can
+fit in the memory of a single machine, but there are a lot of forces of different patrol lengths to
+deploy.  You may distribute the input across the machines in whatever manner you prefer. You can
+use your choice of technologies. At a high level, give a short explanation of how you would
+parallelize the task. Feel free to make appropriate assumptions.
+
+
+
+Presumable one would host some sort of estimation service on the machines, which would receive some subset of the parent information, such as city blocks, coverage, and so on. The role of this service would be to evaluate the coverage and return the resulting level.
+
+The parent machine would be responsible for partitioning the permutations and distributing the estimation requests.
+
+A third service might be used to receive some sort of callback with the response, whose job it would be to receive the result, as well as some minimum key information such as request context id, in order to keep track of the results. High results can be ignored, whereas lower results should be recorded, or at least maintained in memory.
+
+Any number of machines could be allocated with the estimation services, while there are at least two other serivces allocated for managing permutation and estimation requests, as well as for result integration.
+
+
 
 Feedback
 
-We strive to make taking these challenges as enjoyable as possible for developers.  Please let us know how you enjoyed your DevDraft challenge experience, what you liked, and anything you would like to see improved.  Thank you for participating.
+We strive to make taking these challenges as enjoyable as possible for developers.  Please let us
+know how you enjoyed your DevDraft challenge experience, what you liked, and anything you would
+like to see improved.  Thank you for participating.
+
+
+
+I appreciate your team being available for Q&A throughout the process. I look forward to positive feedback from the clients.
+
+
+
 
 https://app.devdraft.com/#!/workspace/72e6d226-daa5-4333-8473-850853d62aa9
